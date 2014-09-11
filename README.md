@@ -1,0 +1,1 @@
+This is an app showing the use of Mongo and JSDO while working with Rollbase. It shows the locations of the snowplows both most recently and at any historical time in the databse. When running queries, it directly calls the MongoDB and when showing the most recent data, it just queries Rollbase. You can view the app at http://locationviewer-22339.onmodulus.net/.
