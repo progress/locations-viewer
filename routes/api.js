@@ -9,7 +9,7 @@ var viewId = 'YOUR ROLLBASE VIEWID';
 var sessionId = '';
 login();
 // This logs back in periodically. Currently it logs in every hour, but the interval can be adjusted.
-var interval = setInterval(login, 3600000);
+var interval = setInterval(login, 360000);
 
 
 //MongoDB setup
