@@ -9,28 +9,33 @@ h2 {
 }
 
 h4 {
-    font-size:1.5em;
+    font-size:1.3em;
     font-weight:normal;
 }
 button {
-  font-size: 1.25em;
+  font-size: 1em;
+}
+img {
+  padding: 8em 24em;
+  width: 16em;
+  height: 16em;
 }
 input {
     font-family: 'Helvetica Neue', Helvetica, Helvetica, Arial, sans-serif;
     font-weight:normal;
-    font-size:1em;
+    font-size:.9em;
     background:transparent;
     border: transparent;
 }
 map, div[map] {
- display:inline-block; width:54em; height:32em;
+ display:inline-block; width:64em; height:42em;
  padding-left: 2em;
  }
 .switch {
    display:inline-block;
 }
  #pickadate {
- display:inline-block; width:25em; height:30em;
+ display:inline-block; width:25em; height:20em;
  vertical-align:top;
  padding-left: 2em;
 }

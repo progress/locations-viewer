@@ -45,8 +45,8 @@ var locations1 = mongoose.model('locations1', locationSchema, 'locations1');
 
 // Function for running queries on the MongoDB
 exports.getData = function(req, result) {
-    var lowTime = req.params.time + ':00';
-    var highTime = req.params.time + ':59';
+    var lowTime = req.params.time.substring(0, 19);
+    var highTime = req.params.time.substring(19);
     console.log(lowTime);
     console.log(highTime);
     var query = locations1.find({
@@ -55,17 +55,23 @@ exports.getData = function(req, result) {
             $lte: highTime
         }
     });
-    query.select('ReadingTime Location');
+    query.select('Location');
+    query.limit(30);
+    query.sort({
+        'ReadingTime': 1
+    });
     query.exec(function(err, locations) {
+        console.log(err);
         var locationsData = [];
         for (var i = 0; i < locations.length; i++) {
             if (locationsData.indexOf(locations[i].Location) == -1) {
                 locationsData.push(locations[i].Location);
             }
         };
-        console.log(locations);
+        console.log(locationsData.length);
         result.json({
-            'locationData': locationsData
+            'locationData': locationsData.slice(0,10),
+            'count': locationsData.length
         });
     });
 };
@@ -139,8 +145,81 @@ exports.getInfo = function(req, result) {
                     'locationData': locations
                 });
             } else {
-                console.log('Getting info failed');
-                console.log(data);
+                // Will try logging in again and returning results if it fails
+                var loginOptions = {
+                    host: 'rollbase.com',
+                    port: 443,
+                    // Note this is password not Password like in documentation
+                    path: '/rest/api/login?&output=json&password=' + password + '&loginName=' + username
+                };
+
+                console.info('Options prepared:');
+                console.info(loginOptions);
+                console.info('Do the Login');
+                // do the request
+                var loginGet = https.request(loginOptions, function(res1) {
+                    console.log("statusCode: ", res1.statusCode);
+                    var data1 = '';
+
+                    res1.on('data', function(d) {
+                        data1 += d;
+                    });
+                    res1.on('end', function() {
+                        console.info('Login result:');
+                        console.log(data1);
+                        var obj1 = JSON.parse(data1);
+                        if (obj1.status == 'ok') {
+                            console.log(obj1.sessionId);
+                            sessionId = obj1.sessionId;
+                            var get2Options = {
+                                host: 'rollbase.com',
+                                port: 443,
+                                // My viewId for the posts view was found at Application Setup > Objects > Post > All Posts
+                                path: '/rest/api/get2Page?&output=json&sessionId=' + sessionId + '&viewId=' + viewId
+                            };
+                            // do the request
+                            var get2Info = https.request(get2Options, function(res2) {
+                                console.log("statusCode: ", res2.statusCode);
+                                var data2 = '';
+                                res2.on('data', function(d) {
+                                    data2 += d;
+                                });
+                                res2.on('end', function() {
+                                    // < 400 means request probably succeeded 
+                                    if (res2.statusCode < 400) {
+                                        var obj2 = JSON.parse(data2);
+                                        var locations = [];
+                                        for (var i = 0; i < obj2.length; i++) {
+                                            if (locations.indexOf(obj2[i].Location) == -1) {
+                                                locations.push(obj2[i].Location);
+                                            }
+                                        }
+                                        console.log(locations);
+                                        result.json({
+                                            'locationData': locations
+                                        });
+                                    } else {
+                                        result.json({
+                                            'locationData': []
+                                        });
+                                    }
+                                })
+                            });
+                            get2Info.end();
+                            get2Info.on('error', function(e) {
+                                console.error(e);
+                            });
+                        } else {
+                            result.json({
+                                'locationData': []
+                            });
+                        }
+                    })
+                });
+                loginGet.end();
+                loginGet.on('error', function(e) {
+                    console.error(e);
+                });
             }
         })
     });

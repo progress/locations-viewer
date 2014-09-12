@@ -2,21 +2,36 @@ extends layout
 
 block body
   div(ng-controller='AppCtrl')
-    h2 Location Viewer
+    h3 Location Viewer
     #pickadate
         div(pickadate ng-model='date')
         form(name='timeInput')
-          h4 Time:
+          h4 Start Time:
             input(type='time', name='input', placeholder='HH:mm:ss',
             ng-model='time')
+        div(pickadate ng-model='date2')
+        form(name='timeInput2')
+          h4 End Time:
+            input(type='time', name='input2', placeholder='HH:mm:ss',
+            ng-model='time2')
         button(ng-click='oldData()') View Historical Data
-        p
+        <br />
+        .switch(ng-switch='error')
+          .switch(ng-switch-when='toofew')
+            h5 No results found. Try a larger interval or different season.
+          .switch(ng-switch-when='toomany')
+            h5 There were a lot of results. The first few have been shown. 
+          .switch(ng-switch-when='incomplete')
+            h5 Please fill in both times and dates
+        <br />
         button(ng-click='realtime()') Current Data
     .switch(ng-switch='displayType')
       .switch(ng-switch-when='map')
-        map(zoom="9", center='[39.8,-104.9]')
+        map(zoom="9", center='[39.7,-104.9]')
           m(ng-repeat='address in addresses')
-            marker(position='{{address}}')
+            marker(position='{{address}}', icon='{{ (isUpdating || address == start || address == end) && "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FE7569" || "http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_red.png" }}')
+      .switch(ng-switch-when='hidemap')
+        img(src='img/loading.gif')
 
   script(src='https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.0/angular.min.js')
   script(src='https://code.angularjs.org/1.3.0-rc.0/angular-route.min.js')
