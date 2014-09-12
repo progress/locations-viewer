@@ -16,7 +16,7 @@ button {
   font-size: 1em;
 }
 img {
-  padding: 8em 24em;
+  padding: 8em 15em;
   width: 16em;
   height: 16em;
 }
@@ -28,14 +28,14 @@ input {
     border: transparent;
 }
 map, div[map] {
- display:inline-block; width:64em; height:42em;
+ display:inline-block; width:46em; height:42em;
  padding-left: 2em;
  }
 .switch {
    display:inline-block;
 }
  #pickadate {
- display:inline-block; width:25em; height:20em;
+ display:inline-block; width:23em; height:20em;
  vertical-align:top;
  padding-left: 2em;
 }
