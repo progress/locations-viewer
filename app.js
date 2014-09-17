@@ -21,7 +21,6 @@ app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(express.static(path.join(__dirname, 'public')));
-
 var env = process.env.NODE_ENV || 'development';
 
 /**
@@ -32,6 +31,8 @@ var env = process.env.NODE_ENV || 'development';
 // You would be able to also call other functions in the api.js file.
 app.post('/api/getData:time', api.getData);
 app.get('/api/getInfo', api.getInfo);
+app.post('/api/addUser:data', api.addUser);
+app.post('/api/getEmails:data', api.getEmails);
 
 
 // redirect all others to the index (HTML5 history)

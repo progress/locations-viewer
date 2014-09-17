@@ -4,21 +4,74 @@
 
 angular.module('myApp.controllers', []).
 controller('AppCtrl', function($scope, $http) {
+    $scope.showEmails = 'hide';
     $scope.isUpdating = true;
     $scope.addresses = [];
     $scope.displayType = 'map';
     $scope.error = 'noerror';
+    $scope.types = [{
+        option: 'Location Viewer'
+    }, {
+        option: 'User Editor'
+    }];
+    $scope.$watch('type', function() {
+        if ($scope.type == $scope.types[0]) {
+            $scope.error = 'noerror';
+            update();
+        };
+    });
+    $scope.type = $scope.types[0];
     var map, date, time;
     var interval = setInterval(update, 120000);
-
     //This function is called when the user switches to current information.
     $scope.realtime = function() {
+        $scope.showEmails = 'hide';
         $scope.error = 'noerror';
         $scope.displayType = 'hidemap';
         $scope.isUpdating = true;
         update();
     };
-
+    $scope.clicked = function(address) {
+        $scope.showEmails = 'hide';
+        // Code for getting zip code from marker
+        var lat = address.latLng.k;
+        var lng = address.latLng.B;
+        var latlng = new google.maps.LatLng(lat, lng);
+        var geocoder = new google.maps.Geocoder();
+        geocoder.geocode({
+            'latLng': latlng
+        }, function(results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                if (results[0]) {
+                    for (var j = 0; j < results[0].address_components.length; j++) {
+                        if (results[0].address_components[j].types[0] == 'postal_code') {
+                            var zip = results[0].address_components[j].short_name;
+                            $http.post('/api/getEmails' + zip).
+                            success(function(data) {
+                                $scope.showEmails = 'show';
+                                $scope.emails = data.emails;
+                            });
+                        }
+                    }
+                }
+            }
+        });
+    }
+    $scope.addUser = function() {
+        $scope.showEmails = 'hide';
+        $scope.error = 'noerror';
+        var info = $scope.$$childTail;
+        var userInfo = {};
+        //This was an easy way to pass information between the frontend and backend after switching from Express 2 to 4.
+        $http.post('/api/addUser' + info.email + '.*.' + info.address + '.*.' + info.city + '.*.' + info.zip).
+        success(function(data) {
+            if (data) {
+                $scope.type = $scope.types[0];
+            } else {
+                $scope.error = 'nosave';
+            }
+        });
+    };
     // This function updates information by calling api.js, which in turn calls Rollbase.
     function update() {
         if ($scope.isUpdating) {
@@ -37,12 +90,14 @@ controller('AppCtrl', function($scope, $http) {
 
     // This function queries api.js, which in turn queries Mongo. 
     $scope.oldData = function() {
+        $scope.showEmails = 'hide';
         $scope.error = 'noerror';
-        var time = $scope.timeInput.input.$viewValue;
-        var time2 = $scope.timeInput2.input2.$viewValue;
-        var date = $scope.date;
-        var date2 = $scope.date2;
-        if (time.length < 1 || time2.length < 1 || typeof date == 'undefined' ||  typeof date2 == 'undefined') {
+        var info = $scope.$$childTail;
+        var time = info.timeInput.input.$viewValue;
+        var time2 = info.timeInput2.input2.$viewValue;
+        var date = info.date;
+        var date2 = info.date2;
+        if (time.length < 1 || time2.length < 1 || typeof date == 'undefined' || typeof date2 == 'undefined') {
             $scope.error = 'incomplete';
             return;
         }
@@ -54,12 +109,12 @@ controller('AppCtrl', function($scope, $http) {
             $scope.addresses = [];
             // This is to change the formatting for Google maps
             for (var i = 0; i < data.locationData.length; i++) {
-                $scope.addresses.push('position=' + data.locationData[i].replace(/-/g, " "));
+                $scope.addresses.push(data.locationData[i].replace(/-/g, " "));
             }
             $scope.start = $scope.addresses[0];
             $scope.end = $scope.addresses[$scope.addresses.length - 1];
-            if(data.count == 0) {
-                    $scope.error = 'toofew';
+            if (data.count == 0) {
+                $scope.error = 'toofew';
             } else if (data.count > 10) {
                 $scope.error = 'toomany';
             }

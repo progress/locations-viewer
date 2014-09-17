@@ -1,6 +1,6 @@
 {
   "name": "location-viewer",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "dependencies": {
     "express": "~4.1.1",
