@@ -14,16 +14,19 @@ controller('AppCtrl', function($scope, $http) {
     }, {
         option: 'User Editor'
     }];
+    $scope.type = $scope.types[0];
+    var map;
+    var interval = setInterval(update, 120000);
+
+    // Clears errors and updates necessary information when updating
     $scope.$watch('type', function() {
+        $scope.error = 'noerror';
         if ($scope.type == $scope.types[0]) {
-            $scope.error = 'noerror';
             update();
         };
     });
-    $scope.type = $scope.types[0];
-    var map, date, time;
-    var interval = setInterval(update, 120000);
-    //This function is called when the user switches to current information.
+
+    // This function is called when the user switches to current information.
     $scope.realtime = function() {
         $scope.showEmails = 'hide';
         $scope.error = 'noerror';
@@ -31,13 +34,15 @@ controller('AppCtrl', function($scope, $http) {
         $scope.isUpdating = true;
         update();
     };
-    $scope.clicked = function(address) {
+
+    // This function is called when a marker is clicked
+    $scope.markerClicked = function(address) {
         $scope.showEmails = 'hide';
-        // Code for getting zip code from marker
         var lat = address.latLng.k;
         var lng = address.latLng.B;
         var latlng = new google.maps.LatLng(lat, lng);
         var geocoder = new google.maps.Geocoder();
+        // Code for getting zip code and passing it to api
         geocoder.geocode({
             'latLng': latlng
         }, function(results, status) {
@@ -57,6 +62,8 @@ controller('AppCtrl', function($scope, $http) {
             }
         });
     }
+
+    // This 
     $scope.addUser = function() {
         $scope.showEmails = 'hide';
         $scope.error = 'noerror';
@@ -72,6 +79,7 @@ controller('AppCtrl', function($scope, $http) {
             }
         });
     };
+
     // This function updates information by calling api.js, which in turn calls Rollbase.
     function update() {
         if ($scope.isUpdating) {
@@ -88,7 +96,7 @@ controller('AppCtrl', function($scope, $http) {
         }
     };
 
-    // This function queries api.js, which in turn queries Mongo. 
+    // This function queries api.js, which in turn queries Mongo for events in an interval.
     $scope.oldData = function() {
         $scope.showEmails = 'hide';
         $scope.error = 'noerror';
@@ -105,7 +113,6 @@ controller('AppCtrl', function($scope, $http) {
         $scope.displayType = 'hidemap';
         $http.post('/api/getData' + date + ' ' + time + ':00' + date2 + ' ' + time2 + ':59').
         success(function(data) {
-            console.log(data);
             $scope.addresses = [];
             // This is to change the formatting for Google maps
             for (var i = 0; i < data.locationData.length; i++) {
@@ -113,6 +120,7 @@ controller('AppCtrl', function($scope, $http) {
             }
             $scope.start = $scope.addresses[0];
             $scope.end = $scope.addresses[$scope.addresses.length - 1];
+            // This sets errors if there are a lot of results or no results.
             if (data.count == 0) {
                 $scope.error = 'toofew';
             } else if (data.count > 10) {

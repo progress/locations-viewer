@@ -7,18 +7,17 @@ var password = 'YOUR ROLLBASE PASSWORD';
 var username = 'YOUR ROLLBASE USERNAME';
 var viewId = 'YOUR ROLLBASE VIEWID';
 var objectIntegrationName = 'YOUR OBJECT INTEGRATION NAME';
-
 var sessionId = '';
 login();
 // This logs back in periodically. Currently it logs in every hour, but the interval can be adjusted.
 var interval = setInterval(login, 360000);
-
 
 //MongoDB setup
 var mongoose = require('mongoose');
 var modulusUsername = 'YOUR MODULUS USERNAME';
 var modulusPassword = 'YOUR MODULUS PASSWORD';
 var databaseName = 'YOUR DATABASE NAME';
+var collectionName = 'YOUR COLLECTION NAME';
 
 mongoose.connect(
     'mongodb://' + modulusUsername + ':' + modulusPassword + '@proximus.modulusmongo.net:27017/' + databaseName
@@ -44,15 +43,13 @@ var locationSchema = mongoose.Schema({
     processed: Number,
     townid: Number
 });
-var locations1 = mongoose.model('locations1', locationSchema, 'locations1');
+var locationModel = mongoose.model(collectionName, locationSchema, collectionName);
 
 // Function for running queries on the MongoDB
 exports.getData = function(req, result) {
     var lowTime = req.params.time.substring(0, 19);
     var highTime = req.params.time.substring(19);
-    console.log(lowTime);
-    console.log(highTime);
-    var query = locations1.find({
+    var query = locationModel.find({
         'ReadingTime': {
             $gte: lowTime,
             $lte: highTime
@@ -64,14 +61,14 @@ exports.getData = function(req, result) {
         'ReadingTime': 1
     });
     query.exec(function(err, locations) {
-        console.log(err);
         var locationsData = [];
+        // Screens out duplicates
         for (var i = 0; i < locations.length; i++) {
             if (locationsData.indexOf(locations[i].Location) == -1) {
                 locationsData.push(locations[i].Location);
             }
         };
-        console.log(locationsData.length);
+        // Limits result to at most 10 locations
         result.json({
             'locationData': locationsData.slice(0, 10),
             'count': locationsData.length
@@ -79,7 +76,7 @@ exports.getData = function(req, result) {
     });
 };
 
-// Function for logging in with credentials. It updates the sessionId token and also calls updateData to update any data. 
+// Function for logging into Rollbase with credentials. It updates the sessionId token and also calls updateData to update any data. 
 function login() {
     var loginOptions = {
         host: 'rollbase.com',
@@ -87,24 +84,15 @@ function login() {
         // Note this is password not Password like in documentation
         path: '/rest/api/login?&output=json&password=' + password + '&loginName=' + username
     };
-
-    console.info('Options prepared:');
-    console.info(loginOptions);
-    console.info('Do the Login');
     // do the request
     var loginGet = https.request(loginOptions, function(res) {
-        console.log("statusCode: ", res.statusCode);
         var data = '';
-
         res.on('data', function(d) {
             data += d;
         });
         res.on('end', function() {
-            console.info('Login result:');
-            console.log(data);
             var obj = JSON.parse(data);
             if (obj.status == 'ok') {
-                console.log(obj.sessionId);
                 sessionId = obj.sessionId;
             } else {
                 console.log(obj.message);
@@ -117,39 +105,28 @@ function login() {
     });
 }
 
-
-// Function for adding a new 
+// Function for adding a new user into Rollbase
 exports.addUser = function(req, result) {
     var data = req.params.data.split('.*.');
-    console.log(data);
     var createOptions = {
         host: 'rollbase.com',
         port: 443,
         // Note this is objName not objDefName like in documentation
-        // require('querystring').escape() allows strings with spaces and other characters not supported by urls to be included in api calls
-        // objectIntegrationName was the object definition for my post object it was found at Application Setup > Objects > Post > View
-        // I decided to store the title as the object's name
-        path: '/rest/api/createRecord?objName=' + objectIntegrationName + '&useIds=true&email=' + require('querystring').escape(data[0]) + '&state=CO&city='
-         + require('querystring').escape(data[2]) + '&output=json&sessionId=' + sessionId + '&streetAddr1=' + require('querystring').escape(data[1]) + '&zip='
-          + require('querystring').escape(data[3]) + '&name=' + require('querystring').escape(data[0])
+        // encodeURIComponent allows strings with spaces and other characters not supported by urls to be included in api calls
+        path: '/rest/api/createRecord?objName=' + objectIntegrationName + '&useIds=true&email=' + data[0] + '&state=CO&city='
+         + encodeURIComponent(data[2]) + '&output=json&sessionId=' + sessionId + '&streetAddr1=' + encodeURIComponent(data[1])
+         + '&zip=' + data[3] + '&name=' + data[0]
     };
-    console.info('Options prepared:');
-    console.info(createOptions);
-    console.info('Create post');
     // do the request
     var createGet = https.request(createOptions, function(res) {
         console.log("statusCode: ", res.statusCode);
         var data = '';
-
         res.on('data', function(d) {
             data += d;
         });
         res.on('end', function() {
             // < 400 means request probably succeeded 
             if (res.statusCode < 400) {
-                console.info('Create result:');
-                console.log(data);
-                var obj = JSON.parse(data);
                 result.json(true);
             } else {
                 console.log('Creation failed');
@@ -158,24 +135,61 @@ exports.addUser = function(req, result) {
             }
         })
     });
-
     createGet.end();
     createGet.on('error', function(e) {
         console.error(e);
     });
 };
 
-//Function for returning the most recent information from Rollbase. 
+// This runs a sqlQuery when given a zip code to get emails in that zip code.
+exports.getEmails = function(req, result) {
+    // encodeURIComponent allows strings with spaces and other characters not supported by urls to be included in api calls
+    var sqlQuery = encodeURIComponent('SELECT email FROM ' + objectIntegrationName + ' WHERE zip =' + req.params.data);
+    var emailOptions = {
+        host: 'rollbase.com',
+        port: 443,
+        path: '/rest/api/selectQuery?&sessionId=' + sessionId + '&maxRows=25&output=json&query=' + sqlQuery
+    };
+    // do the request
+    var emailsGet = https.request(emailOptions, function(res) {
+        var data = '';
+        res.on('data', function(d) {
+            data += d;
+        });
+        res.on('end', function() {
+            // < 400 means request probably succeeded 
+            if (res.statusCode < 400) {
+                var obj = JSON.parse(data);
+                var emails = [];
+                for (var i = 0; i < obj.length; i++) {
+                    emails.push(obj[i][0]);
+                };
+                result.json({
+                    'emails': emails
+                });
+            } else {
+                console.log('Query failed');
+                console.log(data);
+                result.json(false);
+            }
+        })
+    });
+    emailsGet.end();
+    emailsGet.on('error', function(e) {
+        console.error(e);
+    });
+}
+
+// Function for returning the most recent information from Rollbase. If the query fails, it logs in and tries again. 
+// If you don't want to log in again, you can instead use the shorter commented out code at the end.
 exports.getInfo = function(req, result) {
     var getOptions = {
         host: 'rollbase.com',
         port: 443,
-        // My viewId for the posts view was found at Application Setup > Objects > Post > All Posts
         path: '/rest/api/getPage?&output=json&sessionId=' + sessionId + '&viewId=' + viewId
     };
     // do the request
     var getInfo = https.request(getOptions, function(res) {
-        console.log("statusCode: ", res.statusCode);
         var data = '';
         res.on('data', function(d) {
             data += d;
@@ -186,11 +200,11 @@ exports.getInfo = function(req, result) {
                 var obj = JSON.parse(data);
                 var locations = [];
                 for (var i = 0; i < obj.length; i++) {
+                    // Screens out duplicates
                     if (locations.indexOf(obj[i].Location) == -1) {
                         locations.push(obj[i].Location);
                     }
                 }
-                console.log(locations);
                 result.json({
                     'locationData': locations
                 });
@@ -199,43 +213,28 @@ exports.getInfo = function(req, result) {
                 var loginOptions = {
                     host: 'rollbase.com',
                     port: 443,
-                    // Note this is password not Password like in documentation
                     path: '/rest/api/login?&output=json&password=' + password + '&loginName=' + username
                 };
-
-                console.info('Options prepared:');
-                console.info(loginOptions);
-                console.info('Do the Login');
-                // do the request
                 var loginGet = https.request(loginOptions, function(res1) {
-                    console.log("statusCode: ", res1.statusCode);
                     var data1 = '';
-
                     res1.on('data', function(d) {
                         data1 += d;
                     });
                     res1.on('end', function() {
-                        console.info('Login result:');
-                        console.log(data1);
                         var obj1 = JSON.parse(data1);
                         if (obj1.status == 'ok') {
-                            console.log(obj1.sessionId);
                             sessionId = obj1.sessionId;
                             var get2Options = {
                                 host: 'rollbase.com',
                                 port: 443,
-                                // My viewId for the posts view was found at Application Setup > Objects > Post > All Posts
                                 path: '/rest/api/getPage?&output=json&sessionId=' + sessionId + '&viewId=' + viewId
                             };
-                            // do the request
                             var get2Info = https.request(get2Options, function(res2) {
-                                console.log("statusCode: ", res2.statusCode);
                                 var data2 = '';
                                 res2.on('data', function(d) {
                                     data2 += d;
                                 });
                                 res2.on('end', function() {
-                                    // < 400 means request probably succeeded 
                                     if (res2.statusCode < 400) {
                                         var obj2 = JSON.parse(data2);
                                         var locations = [];
@@ -244,11 +243,11 @@ exports.getInfo = function(req, result) {
                                                 locations.push(obj2[i].Location);
                                             }
                                         }
-                                        console.log(locations);
                                         result.json({
                                             'locationData': locations
                                         });
                                     } else {
+                                        console.log(obj2);
                                         result.json({
                                             'locationData': []
                                         });
@@ -260,6 +259,7 @@ exports.getInfo = function(req, result) {
                                 console.error(e);
                             });
                         } else {
+                            console.log(obj1.message);
                             result.json({
                                 'locationData': []
                             });
@@ -278,45 +278,40 @@ exports.getInfo = function(req, result) {
         console.error(e);
     });
 }
-
-exports.getEmails = function(req, result) {
-    var sqlQuery = encodeURIComponent('SELECT email FROM ' + objectIntegrationName + ' WHERE zip =' + req.params.data);
-    var emailOptions = {
+/*exports.getInfo = function(req, result) {
+var getOptions = {
         host: 'rollbase.com',
         port: 443,
-        path: '/rest/api/selectQuery?&sessionId=' + sessionId + '&maxRows=25&output=json&query=' + sqlQuery
+        path: '/rest/api/getPage?&output=json&sessionId=' + sessionId + '&viewId=' + viewId
     };
-    console.info('Options prepared:');
-    console.info(emailOptions);
-    // do the request
-    var emailsGet = https.request(emailOptions, function(res) {
+    var getInfo = https.request(getOptions, function(res) {
+        console.log("statusCode: ", res.statusCode);
         var data = '';
         res.on('data', function(d) {
             data += d;
         });
         res.on('end', function() {
-            // < 400 means request probably succeeded 
             if (res.statusCode < 400) {
-                console.info('Query result:');
                 var obj = JSON.parse(data);
-                var emails = [];
+                var locations = [];
                 for (var i = 0; i < obj.length; i++) {
-                    emails.push(obj[i][0]);
-                };
-                console.log(emails);
+                    if (locations.indexOf(obj[i].Location) == -1) {
+                        locations.push(obj[i].Location);
+                    }
+                }
                 result.json({
-                    'emails': emails
+                    'locationData': locations
                 });
             } else {
-                console.log('Query failed');
-                console.log(data);
-                result.json(false);
+                console.log(obj);
+                result.json({
+                    'locationData': []
+                });
             }
         })
     });
-
     emailsGet.end();
     emailsGet.on('error', function(e) {
         console.error(e);
     });
-}
+}*/

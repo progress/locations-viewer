@@ -1,66 +1,92 @@
 /* app css stylesheet */
 body {
-font-family: 'Helvetica Neue', Helvetica, Helvetica, Arial, sans-serif;
-background-color:#F9F9F9;
+  font-family: 'Helvetica Neue', Helvetica, Helvetica, Arial, sans-serif;
+  background-color: #F9F9F9;
 }
 
 h2 {
-    text-indent:1.3em;
+  text-indent: 1.3em;
 }
+
 p {
   font-size: .7em;
 }
+
 h4 {
-    font-size:1.2em;
-    font-weight:normal;
+  font-size: 1.2em;
+  font-weight: normal;
 }
+
 button {
+  display: block;
   font-size: 1em;
 }
+
 img {
   padding: 8em 17em;
   width: 16em;
   height: 16em;
 }
+
 input {
-    font-family: 'Helvetica Neue', Helvetica, Helvetica, Arial, sans-serif;
-    font-weight:normal;
-    font-size:.9em;
-    background:transparent;
-    border: transparent;
+  font-family: 'Helvetica Neue', Helvetica, Helvetica, Arial, sans-serif;
+  font-weight: normal;
+  font-size: .9em;
+  background: transparent;
+  border: transparent;
 }
+
+input:required:invalid {
+  background: rgba(255, 0, 0, 0.1);
+}
+
+input:required:valid {
+  background: rgba(0, 255, 0, 0.1);
+}
+
 map, div[map] {
- display:inline-block; width:50em; height:40em;
- padding-left: 2em;
- }
- .show {
-    border:solid;
-    border-width: 1px;
-    border-radius: 6px;
-    border-color: #707070;
- }
+  display: inline-block;
+  width: 50em;
+  height: 40em;
+  padding-left: 2em;
+}
+
+.show {
+  border: solid;
+  border-width: 1px;
+  border-radius: 6px;
+  border-color: #707070;
+}
+
 .switch {
-   display:inline-block;
-   vertical-align:top;
+  display: inline-block;
+  vertical-align: top;
 }
- #pickadate {
- display:inline-block; width:14em; height:20em;
- vertical-align:top;
- padding-left: 2em;
+
+#pickadate {
+  display: inline-block;
+  width: 14em;
+  height: 20em;
+  vertical-align: top;
+  padding-left: 2em;
 }
- #emailInfo {
- display:inline-block; width:10em; height:25em;
- vertical-align:top;
- text-align: top;
- padding-left: 2em;
+
+#emailInfo {
+  display: inline-block;
+  width: 10em;
+  height: 25em;
+  vertical-align: top;
+  text-align: top;
+  padding-left: 2em;
 }
+
 select {
-  display:block; 
-  width:8.5em;
-  height:2em;
-  font-size:1.3em;
-  font-weight:normal;
-  background:transparent;
+  display: block;
+  width: 8.5em;
+  height: 2em;
+  font-size: 1.3em;
+  font-weight: normal;
+  background: transparent;
   border: transparent;
 }
 
