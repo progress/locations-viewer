@@ -20,4 +20,6 @@ This is an app showing the use of Mongo and JSDO while working with Rollbase. It
         filters.js              --> custom angular filters
         services.js             --> custom angular services
       views/                    --> jade views
-        main.jade               --> Jade that contains the rendered view of the app
+        main.jade               --> jade that contains the rendered view of the app
+    routes/                   
+      api.js                    --> returns data from mongodb and rollbase
