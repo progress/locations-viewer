@@ -4,7 +4,6 @@
  */
 
 var express = require('express'),
-  routes = require('./routes'),
   api = require('./routes/api'),
   http = require('http'),
   path = require('path');
@@ -18,7 +17,7 @@ var app = module.exports = express();
 
 // all environments. Some of these might not actually be necessary depending on your application
 app.set('port', process.env.PORT || 3000);
-app.set('views', __dirname + '/views');
+app.set('views', __dirname + '/public/views');
 app.set('view engine', 'jade');
 app.use(express.static(path.join(__dirname, 'public')));
 var env = process.env.NODE_ENV || 'development';
@@ -36,7 +35,9 @@ app.post('/api/getEmails:data', api.getEmails);
 
 
 // redirect all others to the index (HTML5 history)
-app.get('*', routes.index);
+app.get('*', function(req, res){
+  res.render('main');
+});
 
 
 /**
