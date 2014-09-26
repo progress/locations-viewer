@@ -5,6 +5,7 @@
   "dependencies": {
     "express": "~4.1.1",
     "jade": "1.7.*",
-    "mongoose": "3.8.*"
+    "mongoose": "3.8.*",
+    "body-parser": "^1.8.2"
   }
 }

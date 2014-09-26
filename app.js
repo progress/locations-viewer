@@ -6,6 +6,7 @@
 var express = require('express'),
   api = require('./routes/api'),
   http = require('http'),
+  bodyParser = require('body-parser'),
   path = require('path');
 
 var app = module.exports = express();
@@ -28,10 +29,15 @@ var env = process.env.NODE_ENV || 'development';
 
 // JSON API
 // You would be able to also call other functions in the api.js file.
+var jsonParser = bodyParser.json()
+
 app.post('/api/getData:time', api.getData);
 app.get('/api/getInfo', api.getInfo);
+app.get('/api/getTreeInfo', api.getTreeInfo);
 app.post('/api/addUser:data', api.addUser);
+app.post('/api/addTree:data', api.addTree);
 app.post('/api/getEmails:data', api.getEmails);
+app.post('/api/inform', jsonParser, api.inform);
 
 
 // redirect all others to the index (HTML5 history)

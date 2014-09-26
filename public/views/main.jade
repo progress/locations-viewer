@@ -9,7 +9,7 @@ html(ng-app="myApp")
     div(ng-controller='AppCtrl')
       select(ng-model='type', ng-options='optionType.option for optionType in types')
       .switch(ng-switch='type.option')
-        .switch(ng-switch-when='Location Viewer')
+        .switch(ng-switch-when='Snowplow & Tree Locations')
           #pickadate
             div(pickadate ng-model='date')
             form(name='timeInput')
@@ -21,7 +21,7 @@ html(ng-app="myApp")
               h4 End Time:
                 input(type='time', name='input2', placeholder='HH:mm:ss',
                 ng-model='time2')
-            button(ng-click='oldData()') View Historical Data
+            button(ng-click='oldData()') Historical Snowplow Locations
             .switch(ng-switch='error')
               .switch(ng-switch-when='toofew')
                 h5 No results found. Try a larger interval or different season.
@@ -29,13 +29,15 @@ html(ng-app="myApp")
                 h5 There were a lot of results. The first few have been shown. 
               .switch(ng-switch-when='incomplete')
                 h5 Please fill in both times and dates
-            button(ng-click='realtime()') Current Data
+            button(ng-click='realtime()') Current Emergency Locations
           .switch(ng-switch='displayType')
             .switch(ng-switch-when='map')
               map(zoom="9", center='[39.7,-104.9]')
                 span(ng-repeat='address in addresses')
                   // A different icon is shown for the middle marker during historical queries
-                  marker(position='{{address}}', icon='{{ (isUpdating || address == start || address == end) && "http://goo.gl/igGrA" || "http://goo.gl/AOuUKq" }}', on-click='markerClicked()', title='{{address}}')
+                  marker(position='{{address}}', icon='{{ (isUpdating || address == start || address == end) && "http://goo.gl/igGrA" || "http://goo.gl/AOuUKq" }}', on-click='markerClicked()', title='Snow Plow')
+                span(ng-repeat='address in addresses2')
+                  marker(position='{{address}}', icon='http://goo.gl/712jzT', title='Fallen Tree', on-click='markerClicked()')
             .switch(ng-switch-when='hidemap')
               img(src='img/loading.gif')
           .switch(ng-switch='showEmails')
@@ -45,7 +47,8 @@ html(ng-app="myApp")
                       span(ng-repeat='email in emails')
                         p
                           a(href='mailto:{{email}}?Subject=Snowplow%20Alert', target='_blank') {{email}}
-        .switch(ng-switch-when='User Editor')
+                    button(ng-click='inform()') Notify affected users
+        .switch(ng-switch-when='Add Affected User')
           form(name='newUser')
             h4 Email:   
               input(type='email', class='show', ng-model='email', required)
@@ -59,6 +62,18 @@ html(ng-app="myApp")
           .switch(ng-switch='error')
            .switch(ng-switch-when='toofew')
              h5 User couldn't be saved. Try again. 
+        .switch(ng-switch-when='Add Fallen Tree')
+          form(name='newTree')
+            h4 Street Address:   
+              input(type='text', class='show', ng-model='address2', pattern='.{5,}', required)
+            h4 City:   
+              input(type='text', class='show', ng-model='city2', pattern='.{2,}', required)
+            h4 Zip Code:    
+              input(type='text', class='show', ng-model='zip2', pattern='[0-9]{5,5}', required)
+          button(ng-click='addTree()', ng-disabled='newTree.$invalid') Add New Fallen Tree Location
+          .switch(ng-switch='error')
+           .switch(ng-switch-when='toofew')
+             h5 Tree couldn't be saved. Try again. 
     script(src='https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.0/angular.min.js')
     script(src='http://maps.google.com/maps/api/js?sensor=false')
     script(src='http://rawgit.com/allenhwkim/angularjs-google-maps/master/build/scripts/ng-map.min.js')

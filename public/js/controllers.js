@@ -3,27 +3,27 @@
 /* Controllers */
 
 angular.module('myApp.controllers', []).
-controller('AppCtrl', function($scope, $http) {
+controller('AppCtrl', function($scope, $http, $timeout) {
+    var uuids;
     $scope.showEmails = 'hide';
     $scope.isUpdating = true;
     $scope.addresses = [];
     $scope.displayType = 'map';
     $scope.error = 'noerror';
     $scope.types = [{
-        option: 'Location Viewer'
+        option: 'Snowplow & Tree Locations'
     }, {
-        option: 'User Editor'
+        option: 'Add Affected User'
+    }, {
+        option: 'Add Fallen Tree'
     }];
     $scope.type = $scope.types[0];
     var map;
-    var interval = setInterval(update, 120000);
+    var interval = setInterval(update, 5000);
 
     // Clears errors and updates necessary information when updating
     $scope.$watch('type', function() {
         $scope.error = 'noerror';
-        if ($scope.type == $scope.types[0]) {
-            update();
-        };
     });
 
     // This function is called when the user switches to current information.
@@ -31,8 +31,12 @@ controller('AppCtrl', function($scope, $http) {
         $scope.showEmails = 'hide';
         $scope.error = 'noerror';
         $scope.displayType = 'hidemap';
-        $scope.isUpdating = true;
-        update();
+        if (!$scope.isUpdating) {
+            $scope.isUpdating = true;
+            update();
+        } else {
+            $scope.displayType = 'map';
+        }
     };
 
     // This function is called when a marker is clicked
@@ -55,6 +59,7 @@ controller('AppCtrl', function($scope, $http) {
                             success(function(data) {
                                 $scope.showEmails = 'show';
                                 $scope.emails = data.emails;
+                                uuids = data.uuids;
                             });
                         }
                     }
@@ -63,7 +68,11 @@ controller('AppCtrl', function($scope, $http) {
         });
     }
 
-    // This 
+    $scope.inform = function() {
+        $http.post('/api/inform', uuids);
+    }
+
+    // This adds a user
     $scope.addUser = function() {
         $scope.showEmails = 'hide';
         $scope.error = 'noerror';
@@ -80,18 +89,52 @@ controller('AppCtrl', function($scope, $http) {
         });
     };
 
+    // This adds a fallen tree
+    $scope.addTree = function() {
+        $scope.showEmails = 'hide';
+        $scope.error = 'noerror';
+        var info = $scope.$$childTail;
+        var userInfo = {};
+        //This was an easy way to pass information between the frontend and backend after switching from Express 2 to 4.
+        $http.post('/api/addTree' + info.address2 + ', ' + info.city2 + ', CO ' + info.zip2).
+        success(function(data) {
+            if (data) {
+                $scope.type = $scope.types[0];
+            } else {
+                $scope.error = 'nosave';
+            }
+        });
+    };
+
     // This function updates information by calling api.js, which in turn calls Rollbase.
     function update() {
         if ($scope.isUpdating) {
             map.markers = [];
+            $scope.addresses = [];
+            $scope.addresses2 = [];
+            var addresses = [];
+            var addresses2 = [];
             $http.get('/api/getInfo').
             success(function(data) {
-                $scope.addresses = [];
-                // This is to change the formatting for Google maps
-                for (var i = 0; i < data.locationData.length; i++) {
-                    $scope.addresses.push(data.locationData[i].replace(/-/g, " "));
-                }
-                $scope.displayType = 'map';
+                $http.get('/api/getTreeInfo').
+                success(function(data2) {
+                    // This is to change the formatting for Google maps
+                    for (var i = 0; i < data2.locationData.length; i++) {
+                        addresses2.push(data2.locationData[i].replace(/-/g, " "));
+                        if (i == 2) break;
+                    }
+                    // This is to change the formatting for Google maps
+                    for (var i = 0; i < data.locationData.length; i++) {
+                        if (addresses2.indexOf(data.locationData[i].replace(/-/g, " ")) == -1)
+                            addresses.push(data.locationData[i].replace(/-/g, " "));
+                        if (i == 5) break;
+                    }
+                    $scope.addresses = addresses;
+                    $scope.addresses2 = addresses2;
+                    console.log(addresses2);
+                    console.log(addresses);
+                    $scope.displayType = 'map';
+                });
             });
         }
     };
@@ -114,6 +157,7 @@ controller('AppCtrl', function($scope, $http) {
         $http.post('/api/getData' + date + ' ' + time + ':00' + date2 + ' ' + time2 + ':59').
         success(function(data) {
             $scope.addresses = [];
+            $scope.addresses2 = [];
             // This is to change the formatting for Google maps
             for (var i = 0; i < data.locationData.length; i++) {
                 $scope.addresses.push(data.locationData[i].replace(/-/g, " "));

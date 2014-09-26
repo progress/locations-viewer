@@ -6,8 +6,11 @@ var https = require('https');
 var password = 'YOUR ROLLBASE PASSWORD';
 var username = 'YOUR ROLLBASE USERNAME';
 var viewId = 'YOUR ROLLBASE VIEWID';
+var viewId2 = 'YOUR SECOND ROLLBASE VIEWID';
 var objectIntegrationName = 'YOUR OBJECT INTEGRATION NAME';
+var objectIntegrationName2 = 'YOUR SECOND OBJECT INTEGRATION NAME';
 var sessionId = '';
+
 login();
 // This logs back in periodically. Currently it logs in every hour, but the interval can be adjusted.
 var interval = setInterval(login, 360000);
@@ -113,9 +116,40 @@ exports.addUser = function(req, result) {
         port: 443,
         // Note this is objName not objDefName like in documentation
         // encodeURIComponent allows strings with spaces and other characters not supported by urls to be included in api calls
-        path: '/rest/api/createRecord?objName=' + objectIntegrationName + '&useIds=true&email=' + data[0] + '&state=CO&city='
-         + encodeURIComponent(data[2]) + '&output=json&sessionId=' + sessionId + '&streetAddr1=' + encodeURIComponent(data[1])
-         + '&zip=' + data[3] + '&name=' + data[0]
+        path: '/rest/api/createRecord?objName=' + objectIntegrationName + '&useIds=true&email=' + data[0] + '&state=CO&city=' + encodeURIComponent(data[2]) + '&output=json&sessionId=' + sessionId + '&streetAddr1=' + encodeURIComponent(data[1]) + '&zip=' + data[3] + '&name=' + data[0]
+    };
+    // do the request
+    var createGet = https.request(createOptions, function(res) {
+        console.log("statusCode: ", res.statusCode);
+        var data = '';
+        res.on('data', function(d) {
+            data += d;
+        });
+        res.on('end', function() {
+            // < 400 means request probably succeeded 
+            if (res.statusCode < 400) {
+                result.json(true);
+            } else {
+                console.log('Creation failed');
+                console.log(data);
+                result.end();
+            }
+        })
+    });
+    createGet.end();
+    createGet.on('error', function(e) {
+        console.error(e);
+    });
+};
+
+// Function for adding a new user into Rollbase
+exports.addTree = function(req, result) {
+    var createOptions = {
+        host: 'rollbase.com',
+        port: 443,
+        // Note this is objName not objDefName like in documentation
+        // encodeURIComponent allows strings with spaces and other characters not supported by urls to be included in api calls
+        path: '/rest/api/createRecord?objName=' + objectIntegrationName2 + '&useIds=true&Location=' + encodeURIComponent(req.params.data) + '&output=json&sessionId=' + sessionId
     };
     // do the request
     var createGet = https.request(createOptions, function(res) {
@@ -144,7 +178,7 @@ exports.addUser = function(req, result) {
 // This runs a sqlQuery when given a zip code to get emails in that zip code.
 exports.getEmails = function(req, result) {
     // encodeURIComponent allows strings with spaces and other characters not supported by urls to be included in api calls
-    var sqlQuery = encodeURIComponent('SELECT email FROM ' + objectIntegrationName + ' WHERE zip =' + req.params.data);
+    var sqlQuery = encodeURIComponent('SELECT email, uuid FROM ' + objectIntegrationName + ' WHERE zip =' + req.params.data);
     var emailOptions = {
         host: 'rollbase.com',
         port: 443,
@@ -161,11 +195,16 @@ exports.getEmails = function(req, result) {
             if (res.statusCode < 400) {
                 var obj = JSON.parse(data);
                 var emails = [];
+                var uuids = [];
                 for (var i = 0; i < obj.length; i++) {
                     emails.push(obj[i][0]);
+                    if (obj[i][1]) {
+                        uuids.push(obj[i][1]);
+                    }
                 };
                 result.json({
-                    'emails': emails
+                    'emails': emails,
+                    'uuids': uuids
                 });
             } else {
                 console.log('Query failed');
@@ -278,11 +317,16 @@ exports.getInfo = function(req, result) {
         console.error(e);
     });
 }
-/*exports.getInfo = function(req, result) {
-var getOptions = {
+exports.inform = function(req, result) {
+    //req.body is the list of uuids
+    console.log(req.body);
+}
+exports.getTreeInfo = function(req, result) {
+    console.log('called');
+    var getOptions = {
         host: 'rollbase.com',
         port: 443,
-        path: '/rest/api/getPage?&output=json&sessionId=' + sessionId + '&viewId=' + viewId
+        path: '/rest/api/getPage?&output=json&sessionId=' + sessionId + '&viewId=' + viewId2
     };
     var getInfo = https.request(getOptions, function(res) {
         console.log("statusCode: ", res.statusCode);
@@ -303,15 +347,15 @@ var getOptions = {
                     'locationData': locations
                 });
             } else {
-                console.log(obj);
+                console.log(data);
                 result.json({
                     'locationData': []
                 });
             }
         })
     });
-    emailsGet.end();
-    emailsGet.on('error', function(e) {
+    getInfo.end();
+    getInfo.on('error', function(e) {
         console.error(e);
     });
-}*/
+}
