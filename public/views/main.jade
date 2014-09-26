@@ -29,7 +29,7 @@ html(ng-app="myApp")
                 h5 There were a lot of results. The first few have been shown. 
               .switch(ng-switch-when='incomplete')
                 h5 Please fill in both times and dates
-            button(ng-click='realtime()') Current Emergency Locations
+            button(ng-click='realtime()') Current Snowplows and Emergencies
           .switch(ng-switch='displayType')
             .switch(ng-switch-when='map')
               map(zoom="9", center='[39.7,-104.9]')
