@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Application id="108951250" origId="108951250" orderNo="4" isSystem="false" version="2" packedId="0" language="en" >
+<Application id="108951250" origId="108951250" orderNo="4" isSystem="false" version="3" packedId="0" language="en" >
 <DisplayName>SnowplowDemoService</DisplayName>
 <Props>
 <showMenus>false</showMenus>
@@ -181,6 +181,44 @@
 </RelationshipDef><RelationshipDef id="107445235" origId="2110137" relName="ORG_CHART" objDef1="USER" objDef2="USER" singularName1="Reports To" pluralName1="Reports To" singularName2="Direct Report" pluralName2="Direct Reports" isMultiple1="false" isMultiple2="true" orphanControl1="false" orphanControl2="false" cloneRelated1="false" cloneRelated2="false" isSystem="false" isPkFk="false">
 </RelationshipDef><RelationshipDef id="107445224" origId="2354869" relName="USER_GROUP" objDef1="$GROUP" objDef2="USER" singularName1="Group" pluralName1="Groups" singularName2="User" pluralName2="Users" isMultiple1="true" isMultiple2="true" orphanControl1="false" orphanControl2="false" cloneRelated1="false" cloneRelated2="false" isSystem="false" isPkFk="false">
 </RelationshipDef></RelationshipDefs>
+</DataObjectDef>
+<DataObjectDef id="110253700" origId="110253700" objDefName="tree1" >
+<SingularName>tree</SingularName>
+<PluralName>trees</PluralName>
+<DataFieldDefs>
+<DataFieldDef id="110253711" origId="110253711" fieldName="updatedBy" >
+<DisplayLabel>Updated By</DisplayLabel>
+</DataFieldDef>
+<DataFieldDef id="110253710" origId="110253710" fieldName="createdAt" >
+<DisplayLabel>Created At</DisplayLabel>
+</DataFieldDef>
+<DataFieldDef id="110253709" origId="110253709" fieldName="createdBy" >
+<DisplayLabel>Created By</DisplayLabel>
+</DataFieldDef>
+<DataFieldDef id="110253702" origId="110253702" fieldName="comment" >
+<DisplayLabel>Comments</DisplayLabel>
+</DataFieldDef>
+<DataFieldDef id="110253701" origId="110253701" fieldName="name" >
+<DisplayLabel>tree</DisplayLabel>
+</DataFieldDef>
+<DataFieldDef id="110253714" origId="110253714" fieldName="id" >
+<DisplayLabel>ID</DisplayLabel>
+</DataFieldDef>
+<DataFieldDef id="110253712" origId="110253712" fieldName="updatedAt" >
+<DisplayLabel>Updated At</DisplayLabel>
+</DataFieldDef>
+<DataFieldDef id="110253713" origId="110253713" fieldName="tag" >
+<DisplayLabel>Tags</DisplayLabel>
+</DataFieldDef>
+<DataFieldDef id="110261574" origId="110261574" fieldName="Location" >
+<DisplayLabel>Location</DisplayLabel>
+</DataFieldDef>
+</DataFieldDefs>
+<ListViews>
+<ListView id="110253983" origId="110253983" orderNo="0">
+<ViewName>All trees</ViewName>
+</ListView>
+</ListViews>
 </DataObjectDef>
 </DependentDefs>
 <DataObjectDefs>
@@ -389,6 +427,14 @@
 <DataFieldDef id="109334287" origId="109334287" objDef="109334282" columnName="STR1" fieldName="streetAddr2" groupName="LOCATION" dataClassName="com.rb.core.data.definition.FieldString" uiClassName="com.rb.core.ui.web.field.TextInput" isRequired="false" isReadOnly="false" isTextIndexable="false" isSystem="false" isAuditable="false" hasPermissions="false" maxLength="100" >
 <DisplayLabel>Street Address 2</DisplayLabel>
 </DataFieldDef>
+<DataFieldDef id="110253694" origId="110253694" objDef="109334282" columnName="STR5" fieldName="uuid" dataClassName="com.rb.core.data.definition.FieldString" uiClassName="com.rb.core.ui.web.field.TextInput" isRequired="false" isReadOnly="false" isTextIndexable="false" isSystem="false" isAuditable="false" hasPermissions="false" maxLength="0" >
+<DisplayLabel>UUID</DisplayLabel>
+<Props>
+<isUnique>false</isUnique>
+<isLocalized>false</isLocalized>
+<inlineEdit>true</inlineEdit>
+</Props>
+</DataFieldDef>
 <DataFieldDef id="109334800" origId="109334800" objDef="109334282" columnName="STR4" fieldName="email" dataClassName="com.rb.core.data.definition.FieldString" uiClassName="com.rb.core.ui.web.field.EmailInput" isRequired="true" isReadOnly="false" isTextIndexable="false" isSystem="false" isAuditable="false" hasPermissions="false" maxLength="0" >
 <DisplayLabel>email</DisplayLabel>
 <Props>
@@ -404,7 +450,7 @@
 <defSortAsc>false</defSortAsc>
 </Props>
 <Columns>
-109334283,109334294,109334293,109334800,</Columns>
+109334283,109334294,109334293,109334800,110253694,</Columns>
 </ListView>
 </ListViews>
 </DataObjectDef>
@@ -437,6 +483,21 @@
 <DisplayName>Import</DisplayName>
 </Menu>
 <Menu id="109334799" origId="109334799" objDefId="109334282" orderNo="4" parentId="109334795" pageDefId="109334313" >
+<DisplayName>Templates</DisplayName>
+</Menu>
+</Menus></Menu>
+<Menu id="110254011" origId="110254011" objDefId="110253700" orderNo="1" parentId="-1" pageDefId="110253715" >
+<DisplayName>trees</DisplayName>
+<Menus><Menu id="110254012" origId="110254012" objDefId="110253700" orderNo="1" parentId="110254011" pageDefId="110253717" >
+<DisplayName>New tree</DisplayName>
+</Menu>
+<Menu id="110254013" origId="110254013" objDefId="110253700" orderNo="2" parentId="110254011" pageDefId="110253927" >
+<DisplayName>Search</DisplayName>
+</Menu>
+<Menu id="110254014" origId="110254014" objDefId="110253700" orderNo="3" parentId="110254011" pageDefId="110253930" >
+<DisplayName>Import</DisplayName>
+</Menu>
+<Menu id="110254015" origId="110254015" objDefId="110253700" orderNo="4" parentId="110254011" pageDefId="110253931" >
 <DisplayName>Templates</DisplayName>
 </Menu>
 </Menus></Menu>
@@ -485,6 +546,8 @@
 <PageCell id="109334722" origId="109334722" sectionId="109334721" orderNo="0" alignment="0" fieldId="109334283" cellClassName="com.rb.core.ui.web.cell.FieldWrapper" >
 </PageCell>
 <PageCell id="109334801" origId="109334801" sectionId="109334721" orderNo="1" alignment="0" fieldId="109334800" cellClassName="com.rb.core.ui.web.cell.FieldWrapper" >
+</PageCell>
+<PageCell id="110253696" origId="110253696" sectionId="109334721" orderNo="2" alignment="0" fieldId="110253694" cellClassName="com.rb.core.ui.web.cell.FieldWrapper" >
 </PageCell>
 </PageCells>
 </PageSection>
@@ -539,6 +602,8 @@
 </PageCell>
 <PageCell id="109334802" origId="109334802" sectionId="109334789" orderNo="1" alignment="0" fieldId="109334800" cellClassName="com.rb.core.ui.web.cell.FieldWrapper" >
 </PageCell>
+<PageCell id="110253697" origId="110253697" sectionId="109334789" orderNo="2" alignment="0" fieldId="110253694" cellClassName="com.rb.core.ui.web.cell.FieldWrapper" >
+</PageCell>
 </PageCells>
 </PageSection>
 <PageSection id="109334791" origId="109334791" pageId="109334302" orderNo="2" borderStyle="0" columns="1" viewTabNo="0" pageColNo="0" isCollapsable="false" isDefault="false" hideMobile="true" doNotSynch="true" >
@@ -574,6 +639,8 @@
 <PageCell id="109334735" origId="109334735" sectionId="109334734" orderNo="0" alignment="0" fieldId="109334283" cellClassName="com.rb.core.ui.web.cell.FieldWrapper" >
 </PageCell>
 <PageCell id="109334804" origId="109334804" sectionId="109334734" orderNo="1" alignment="0" fieldId="109334800" cellClassName="com.rb.core.ui.web.cell.FieldWrapper" >
+</PageCell>
+<PageCell id="110253699" origId="110253699" sectionId="109334734" orderNo="2" alignment="0" fieldId="110253694" cellClassName="com.rb.core.ui.web.cell.FieldWrapper" >
 </PageCell>
 </PageCells>
 </PageSection>
@@ -806,10 +873,73 @@ IDxzdHJvbmc+eyFuZXh0U3RhdHVzfTwvc3Ryb25nPiA/</TextB64>
 <WebPages>
 </WebPages>
 </WebPageDef>
+<WebPageDef id="110253717" origId="110253717" isPortal="false" objDefId="110253700" pageType="3" >
+<PageDefName>New tree</PageDefName>
+<JspName>../m/main.jsp</JspName>
+<WebPages>
+<WebPage id="110253718" origId="110253718" pageDefId="110253717" isBaseVersion="true" isLoginOnly="false" >
+<PageName>New tree</PageName>
+<PageSections>
+<PageSection id="110253937" origId="110253937" pageId="110253718" orderNo="0" borderStyle="0" columns="1" viewTabNo="-1" pageColNo="0" isCollapsable="false" isDefault="false" hideMobile="true" doNotSynch="true" >
+<SectionTitle>Page Begin</SectionTitle>
+<PageCells>
+<PageCell id="110253938" origId="110253938" sectionId="110253937" orderNo="0" alignment="0" fieldId="-1" cellClassName="com.rb.core.ui.web.cell.ObjectFormBegin" >
+<TextB64>UGFnZSBCZWdpbg==</TextB64>
+</PageCell>
+</PageCells>
+</PageSection>
+<PageSection id="110253939" origId="110253939" pageId="110253718" orderNo="1" borderStyle="1" columns="1" viewTabNo="0" pageColNo="0" isCollapsable="false" isDefault="true" hideMobile="false" doNotSynch="false" >
+<SectionTitle>tree Information</SectionTitle>
+<PageCells>
+<PageCell id="110253940" origId="110253940" sectionId="110253939" orderNo="0" alignment="0" fieldId="110253701" cellClassName="com.rb.core.ui.web.cell.FieldWrapper" >
+</PageCell>
+<PageCell id="110261578" origId="110261578" sectionId="110253939" orderNo="1" alignment="0" fieldId="110261574" cellClassName="com.rb.core.ui.web.cell.FieldWrapper" >
+</PageCell>
+</PageCells>
+</PageSection>
+<PageSection id="110253941" origId="110253941" pageId="110253718" orderNo="2" borderStyle="1" columns="2" viewTabNo="0" pageColNo="0" isCollapsable="false" isDefault="false" hideMobile="false" doNotSynch="false" >
+<SectionTitle>Location and Address Information</SectionTitle>
+<PageCells>
+</PageCells>
+</PageSection>
+<PageSection id="110253948" origId="110253948" pageId="110253718" orderNo="3" borderStyle="0" columns="1" viewTabNo="-1" pageColNo="0" isCollapsable="false" isDefault="false" hideMobile="true" doNotSynch="true" >
+<SectionTitle>Page End</SectionTitle>
+<PageCells>
+<PageCell id="110253949" origId="110253949" sectionId="110253948" orderNo="0" alignment="0" fieldId="-1" cellClassName="com.rb.core.ui.web.cell.ObjectFormEnd" >
+<TextB64>UGFnZSBFbmQ=</TextB64>
+</PageCell>
+</PageCells>
+</PageSection>
+</PageSections>
+</WebPage>
+</WebPages>
+</WebPageDef>
 <WebPageDef id="108952360" origId="108952360" isPortal="false" objDefId="108952344" pageType="10" >
 <PageDefName>Import</PageDefName>
 <JspName>../m/import.jsp</JspName>
 <WebPages>
+</WebPages>
+</WebPageDef>
+<WebPageDef id="110253715" origId="110253715" isPortal="false" objDefId="110253700" pageType="22" >
+<PageDefName>trees List</PageDefName>
+<JspName>../m/main.jsp</JspName>
+<WebPages>
+<WebPage id="110253716" origId="110253716" pageDefId="110253715" isBaseVersion="true" isLoginOnly="false" >
+<PageName>trees List</PageName>
+<PageSections>
+<PageSection id="110253984" origId="110253984" pageId="110253716" orderNo="0" borderStyle="2" columns="1" viewTabNo="0" pageColNo="0" isCollapsable="false" isDefault="false" hideMobile="false" doNotSynch="false" >
+<SectionTitle>All trees</SectionTitle>
+<PageCells>
+<PageCell id="110253985" origId="110253985" sectionId="110253984" orderNo="0" alignment="0" fieldId="-1" cellClassName="com.rb.core.ui.web.cell.PageableList" >
+<TextB64>UXVlc3Rpb25z</TextB64>
+<Props>
+<objDefId2>110253700</objDefId2>
+</Props>
+</PageCell>
+</PageCells>
+</PageSection>
+</PageSections>
+</WebPage>
 </WebPages>
 </WebPageDef>
 <WebPageDef id="108952365" origId="108952365" isPortal="false" objDefId="108952344" pageType="17" >
@@ -1109,6 +1239,8 @@ IGJlIGFibGUgdG8gdXBkYXRlIGZyb20gdGhpcyBwYWdlLg==</TextB64>
 </PageCell>
 <PageCell id="109334803" origId="109334803" sectionId="109334754" orderNo="1" alignment="0" fieldId="109334800" cellClassName="com.rb.core.ui.web.cell.FieldWrapper" >
 </PageCell>
+<PageCell id="110253698" origId="110253698" sectionId="109334754" orderNo="2" alignment="0" fieldId="110253694" cellClassName="com.rb.core.ui.web.cell.FieldWrapper" >
+</PageCell>
 </PageCells>
 </PageSection>
 <PageSection id="109334756" origId="109334756" pageId="109334306" orderNo="2" borderStyle="1" columns="2" viewTabNo="0" pageColNo="0" isCollapsable="false" isDefault="false" hideMobile="false" doNotSynch="false" >
@@ -1162,6 +1294,12 @@ IGJlIGFibGUgdG8gdXBkYXRlIGZyb20gdGhpcyBwYWdlLg==</TextB64>
 </WebPage>
 </WebPages>
 </WebPageDef>
+<WebPageDef id="110253927" origId="110253927" isPortal="false" objDefId="110253700" pageType="4" >
+<PageDefName>Search</PageDefName>
+<JspName>../m/search.jsp</JspName>
+<WebPages>
+</WebPages>
+</WebPageDef>
 <WebPageDef id="109334309" origId="109334309" isPortal="false" objDefId="109334282" pageType="4" >
 <PageDefName>Search</PageDefName>
 <JspName>../m/search.jsp</JspName>
@@ -1171,6 +1309,12 @@ IGJlIGFibGUgdG8gdXBkYXRlIGZyb20gdGhpcyBwYWdlLg==</TextB64>
 <WebPageDef id="109334314" origId="109334314" isPortal="false" objDefId="109334282" pageType="21" >
 <PageDefName>Questions</PageDefName>
 <JspName>../components/questions.jsp</JspName>
+<WebPages>
+</WebPages>
+</WebPageDef>
+<WebPageDef id="110253930" origId="110253930" isPortal="false" objDefId="110253700" pageType="10" >
+<PageDefName>Import</PageDefName>
+<JspName>../m/import.jsp</JspName>
 <WebPages>
 </WebPages>
 </WebPageDef>
@@ -1210,6 +1354,12 @@ IDxzdHJvbmc+eyFuZXh0U3RhdHVzfTwvc3Ryb25nPiA/</TextB64>
 </PageSection>
 </PageSections>
 </WebPage>
+</WebPages>
+</WebPageDef>
+<WebPageDef id="110253931" origId="110253931" isPortal="false" objDefId="110253700" pageType="12" >
+<PageDefName>Templates</PageDefName>
+<JspName>../m/templates.jsp</JspName>
+<WebPages>
 </WebPages>
 </WebPageDef>
 <WebPageDef id="109334312" origId="109334312" isPortal="false" objDefId="109334282" pageType="10" >
@@ -1285,6 +1435,10 @@ IGJlIGFibGUgdG8gdXBkYXRlIGZyb20gdGhpcyBwYWdlLg==</TextB64>
 <Permission resId="109334799" prId="98" actionsSet="1"/>
 <Permission resId="109334282" prId="98" actionsSet="15"/>
 <Permission resId="109334765" prId="93" actionsSet="1"/>
+<Permission resId="110253700" prId="98" actionsSet="15"/>
+<Permission resId="110253700" prId="91" actionsSet="13"/>
+<Permission resId="110254012" prId="98" actionsSet="1"/>
+<Permission resId="110254014" prId="98" actionsSet="1"/>
 </Permissions><RolePages>
 </RolePages>
 <MobileApps>
