@@ -19,7 +19,7 @@ controller('AppCtrl', function($scope, $http, $timeout) {
     }];
     $scope.type = $scope.types[0];
     var map;
-    var interval = setInterval(update, 20000);
+    var interval = setInterval(update, 60000);
 
     // Clears errors and updates necessary information when updating
     $scope.$watch('type', function() {

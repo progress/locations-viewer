@@ -4,6 +4,7 @@ This is an app showing the use of Mongo and JSDO while working with Rollbase. It
 ### Directory Descriptions
 
     app.js                      --> main app for running server
+    LICENSE.txt                 --> MIT License
     package.json                --> for npm
     README.md                   --> this file
     SnowPlowDemoService_v3.xml  --> rollbase app
