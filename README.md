@@ -6,7 +6,7 @@ This is an app showing the use of Mongo and JSDO while working with Rollbase. It
     app.js                      --> main app for running server
     package.json                --> for npm
     README.md                   --> this file
-    SnowPlowDemoService_v2.xml  --> rollbase app
+    SnowPlowDemoService_v3.xml  --> rollbase app
     public/                     --> files for webpage
       css/                      --> css files
         app.css                 --> css file for making the HTML pretty
